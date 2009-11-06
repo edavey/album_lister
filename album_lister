@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby -wKU
+
+require 'rubygems'
+require 'id3lib'
+require 'find'
+require 'jcode'
+require "yaml"
+require 'activesupport'
+$KCODE = "u"
+
+FILE_TYPES = /(.wma|.mp3)/
+
+PUT_TO_FILE = true
+PUT_TO_SCREEN = true
+
+class File
+  def plus_puts(message = '')
+    self.puts message  if PUT_TO_FILE
+    STDOUT.puts message if PUT_TO_SCREEN
+  end
+end
+
+def dir_list(file_name)
+  dirs = []
+  Find.find(file_name) do |path|
+    if FileTest.directory?(path) && Dir.entries(path).select{|i| i =~ FILE_TYPES}.any?
+      dirs << path 
+    end
+  end
+  dirs
+end
+
+def album_list(dirs)
+  results = []
+  dirs.reverse.each do |d|
+    files = Dir.entries(d).select{|i| i != '.' && i != '..'}
+
+    if files.first
+      if ID3Lib::Tag.new(d + '/' + files.first).genre
+        genre = ID3Lib::Tag.new(d + '/' + files.first).genre.titlecase
+      else
+        genre = "None"
+      end
+      album = ID3Lib::Tag.new(d + '/' + files.first).album
+      artists = []
+      files.each do |f|
+        artists << ID3Lib::Tag.new(d + '/' + f).artist
+      end
+      if artists.uniq.length > 1
+        artist = "Various Artists"
+      else
+        artist = artists.first
+      end
+
+      result = {:artist => artist, :album => album, :genre => genre}
+      results << result
+    end
+  end
+  grouped = results.group_by{|i| i[:genre]}
+
+  # output
+  # ------
+  destination = ARGV[1]
+  File.open(File.expand_path(File.join(destination, "album_list_#{Time.now.to_s}.txt")),"w") do |file| 
+    grouped.each do |genre, items|
+      file.plus_puts "\n"
+      file.plus_puts genre.upcase
+      items.sort_by {|i| [(i[:artist] || 'a'), (i[:album] || 'a')]}.each do |item|
+        file.plus_puts "#{item[:artist]}: #{item[:album]}"
+      end
+    end
+  end
+  
+end
+
+def check_usage
+  unless ARGV.size == 2
+    puts "Usage: album_lister <path_to_disc_or_directory> <path_to_output_directory>"
+    exit
+  end
+  
+end
+
+if $0 == __FILE__
+  check_usage
+  dirs = dir_list(ARGV[0])
+  album_list(dirs)
+end
+
