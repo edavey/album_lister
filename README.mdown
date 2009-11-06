@@ -1,0 +1,92 @@
+Album Lister (uses ID3 tags)
+============================
+
+- A simple script to output a list of albums in a given directory or volume. 
+
+- Albums ordered alphabetically by artist and then by album title
+
+- Albums are grouped by genre
+
+- Compilations are listed as "Various Artists"
+
+- List is printed to console and also written to a file at the given location.
+
+Usage
+-----
+
+    album_lister <path_to_disc_or_directory> <path_to_output_directory>
+    
+This gives you output like this:
+
+    DOWNTEMPO
+    Air: Talkie Walkie
+    Boards of Canada: Music Has the Right to Children
+    Boards of Canada: The Campfire Headphase
+    Bonobo: Dial M for Monkey
+    Cinérex: Exit All Areas (Part 2)
+    Curly Top: Dubmission: More Bass Than Space
+    Hird: Moving on
+    Howie B: Music for Babies
+    Howie B: Snatch
+    Various Artists: Another Late Night (Kid Loco)
+    Various Artists: Another Late Night (Mixed by Fila Brazilia) [Uk]
+    Various Artists: Late Night Tales (Four Tet)
+    Various Artists: Thievery Corporation: Abductions and Reconstructions
+    Zero 7: Simple Things
+    
+    ROCK & POP
+    Bjork: Post
+    Leonard Cohen: Songs of Leonard Cohen
+    Múm: Finally We Are No One
+    Múm: Summer Make Good
+    Pink Floyd: Wish You Were Here
+    Rodrigo Y Gabriela: Rodrigo Y Gabriela
+    Various Artists: Adrian Sherwood Remixes
+    Vincent Gallo: When
+    
+Prerequisites
+-------------
+
+The script uses the artist, track title, album and genre information from the ID3 tags in the files which are found. Prerequisites are:
+
+1. id3lib-ruby (gem install id3lib-ruby)
+  
+2. the underlying id3lib library in C:
+
+    ### Debian
+  
+    Install libid3-dev and be sure to have ruby1.8-dev installed, otherwise you won‘t be able to build Ruby extensions.
+
+          sudo aptitude install libid3-dev
+    
+    ### Gentoo
+      
+          sudo emerge -n id3lib
+    
+    ### OS X with Fink
+    
+    Install id3lib4-dev:
+
+          sudo apt-get install id3lib4-dev
+    
+    Fink puts the library and header files in /sw. In order to enable the id3lib-ruby install program to find them, do:
+
+          export CONFIGURE_ARGS="--with-opt-dir=/sw"
+    
+    ### Manual compilation
+    
+        Download, compile and install id3lib. When installing in /usr/local, you have to set CONFIGURE_ARGS:
+
+          export CONFIGURE_ARGS="--with-opt-dir=/usr/local"
+
+4. ActiveSupport from Rails. I lazily used this for the grouping.
+
+Notes
+-----
+
+Some characters are not represented correctly causing spacing issues. Perhaps switching to Ruby 1.9 will fix this? Patches welcome.    
+
+License
+-------
+
+Do what you like.
