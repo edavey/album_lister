@@ -60,8 +60,8 @@ def album_list(dirs)
 
   # output
   # ------
-  destination = ARGV[1]
-  File.open(File.expand_path(File.join(destination, "album_list_#{Time.now.to_s}.txt")),"w") do |file| 
+  destination = ARGV[1] || "~/Desktop/album_list_#{Time.now.to_s}.txt"
+  File.open(File.expand_path(destination),"w") do |file| 
     grouped.each do |genre, items|
       file.plus_puts "\n"
       file.plus_puts genre.upcase
@@ -74,7 +74,7 @@ def album_list(dirs)
 end
 
 def check_usage
-  unless ARGV.size == 2
+  unless ARGV.size == 1 || ARGV.size == 2
     puts "Usage: album_lister <path_to_disc_or_directory> <path_to_output_directory>"
     exit
   end
